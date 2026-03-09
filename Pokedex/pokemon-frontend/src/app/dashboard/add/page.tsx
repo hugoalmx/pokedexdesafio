@@ -2,60 +2,178 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Zap, Target, Activity, Hash, Tag } from 'lucide-react';
 import api from '@/services/api';
 
 export default function AddPokemonPage() {
   const [name, setName] = useState('');
   const [type, setType] = useState('');
-  const [level, setLevel] = useState(1);
-  const [hp, setHp] = useState(10);
-  const [pokedexNumber, setPokedexNumber] = useState(1);
+  const [level, setLevel] = useState<number | ''>('');
+  const [hp, setHp] = useState<number | ''>('');
+  const [pokedexNumber, setPokedexNumber] = useState<number | ''>('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     try {
-      // O backend espera esses nomes de campos exatos
       await api.post('/pokemon', {
         name,
-        type: [type],
+        // Transforma "Fogo, Voador" em ["Fogo", "Voador"]
+        type: type.split(',').map(t => t.trim()), 
         level: Number(level),
         hp: Number(hp),
-        pokedex_number: Number(pokedexNumber)
+        pokedex_number: Number(pokedexNumber) || 0
       });
 
-      alert('Pokémon capturado! 🔴');
-      router.push('/dashboard'); 
+      router.push('/dashboard');
     } catch (error) {
-      console.error("Erro ao adicionar:", error);
-      alert("Erro 500? Verifique se o backend está recebendo o userId do token.");
+      console.error("Erro ao capturar Pokémon:", error);
+      alert("Falha ao registrar captura. Verifique os dados.");
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white p-6">
-      <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-blue-500">
-        <h1 className="text-2xl font-bold text-blue-400 mb-6 text-center">Registrar Pokémon</h1>
+    <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center p-6 selection:bg-yellow-500/30">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-xl relative"
+      >
+        {/* Efeito de brilho de fundo (Glow) */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-yellow-400 rounded-3xl blur opacity-10"></div>
         
-        <div className="space-y-4">
-          <input type="text" placeholder="Nome do Pokémon" required value={name} onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg outline-none focus:border-blue-400" />
+        {/* Container Principal */}
+        <div className="relative bg-[#121212] border border-white/10 rounded-2xl p-8 md:p-10 shadow-2xl backdrop-blur-xl">
           
-          <input type="text" placeholder="Tipo (ex: Fogo)" required value={type} onChange={(e) => setType(e.target.value)}
-            className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg outline-none" />
+          {/* Botão de Voltar */}
+          <button 
+            onClick={() => router.back()}
+            className="absolute top-6 left-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft size={20} />
+          </button>
 
-          <div className="grid grid-cols-2 gap-4">
-            <input type="number" placeholder="Level" value={level} onChange={(e) => setLevel(Number(e.target.value))}
-              className="p-3 bg-gray-700 border border-gray-600 rounded-lg" />
-            <input type="number" placeholder="HP" value={hp} onChange={(e) => setHp(Number(e.target.value))}
-              className="p-3 bg-gray-700 border border-gray-600 rounded-lg" />
+          {/* Cabeçalho do Formulário */}
+          <div className="text-center mb-10 mt-4">
+            <div className="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
+              <Target size={28} className="text-yellow-500" />
+            </div>
+            <h1 className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent uppercase tracking-widest">
+              Nova Captura
+            </h1>
+            <p className="text-sm text-gray-500 mt-2 uppercase tracking-wider">
+              Registre um novo aliado na base de dados
+            </p>
           </div>
 
-          <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-all shadow-lg">
-            SALVAR NO SISTEMA
-          </button>
+          {/* Formulário */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            
+            {/* Linha 1: Nome e Número */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                  <Zap size={14} className="text-yellow-500"/> Nome do Pokémon
+                </label>
+                <input 
+                  required
+                  type="text" 
+                  value={name} 
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ex: Charizard"
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg p-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                  <Hash size={14} className="text-gray-500"/> Pokedex N.
+                </label>
+                <input 
+                  type="number" 
+                  value={pokedexNumber} 
+                  onChange={(e) => setPokedexNumber(Number(e.target.value))}
+                  placeholder="Ex: 6"
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg p-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Linha 2: Tipo */}
+            <div className="space-y-2">
+              <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                <Tag size={14} className="text-blue-400"/> Tipos
+              </label>
+              <input 
+                required
+                type="text" 
+                value={type} 
+                onChange={(e) => setType(e.target.value)}
+                placeholder="Ex: Fogo, Voador (Separe por vírgulas)"
+                className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg p-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all"
+              />
+            </div>
+
+            {/* Linha 3: Level e HP */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                  <Activity size={14} className="text-green-400"/> Level
+                </label>
+                <input 
+                  required
+                  type="number" 
+                  value={level} 
+                  onChange={(e) => setLevel(Number(e.target.value))}
+                  placeholder="1 - 100"
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg p-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all font-mono"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                  <Activity size={14} className="text-red-400"/> HP Máximo
+                </label>
+                <input 
+                  required
+                  type="number" 
+                  value={hp} 
+                  onChange={(e) => setHp(Number(e.target.value))}
+                  placeholder="Ex: 350"
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg p-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Botão Submit */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              disabled={isLoading}
+              type="submit"
+              className="w-full mt-8 py-4 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase tracking-widest shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Zap size={20} className="animate-bounce" />
+                  Sincronizando...
+                </>
+              ) : (
+                <>
+                  Registrar no Banco
+                </>
+              )}
+            </motion.button>
+
+          </form>
         </div>
-      </form>
+      </motion.div>
     </div>
   );
 }
