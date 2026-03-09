@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password_hash String
+  created_at    DateTime  @default(now())
+  
+  
+  pokemons      Pokemon[] 
+
+  @@map("users") // Nome da tabela no banco
+}
+
+model Pokemon {
+  id             String   @id @default(uuid())
+  name           String
+  type           String[] // Array, pois um Pokémon pode ter mais de um tipo (ex: Fogo e Voador)
+  level          Int
+  hp             Int
+  pokedex_number Int
+  created_at     DateTime @default(now())
+
+  // Relação: Qual treinador registrou este Pokémon
+  created_by     String
+  user           User     @relation(fields: [created_by], references: [id])
+
+  @@map("pokemons") // Nome da tabela no banco
+}
