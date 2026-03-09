@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors(); 
   // Ativando a validação global da API
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true, // Limpa qualquer dado extra/inútil enviado no JSON
