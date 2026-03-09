@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3001', // URL do seu NestJS
+  baseURL: 'https://pokedexdesafio-1.onrender.com', // URL do seu NestJS
 });
 
 // Interceptor para anexar o Token JWT em todas as chamadas
