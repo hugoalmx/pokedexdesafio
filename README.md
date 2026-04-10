@@ -2,7 +2,7 @@
 
 > Aplicação Pokédex desenvolvida como desafio técnico, utilizando **Next.js** no front-end e **NestJS** no back-end, com deploy na Vercel.
 
-🔗 **[Acesse o projeto ao vivo]([https://pokedexdesafio-indol.vercel.app](https://pokedexdesafio-pnpz.vercel.app/))**
+🔗 **[Acesse o projeto ao vivo](https://pokedexdesafio-indol.vercel.app](https://pokedexdesafio-pnpz.vercel.app/))**
 
 ---
 
@@ -76,7 +76,7 @@ pokedexdesafio/
 
 O projeto está disponível em produção pela **Vercel**:
 
-👉 [https://pokedexdesafio-indol.vercel.app]([https://pokedexdesafio-indol.vercel.app](https://pokedexdesafio-pnpz.vercel.app/))
+👉 [https://pokedexdesafio-indol.vercel.app](https://pokedexdesafio-indol.vercel.app](https://pokedexdesafio-pnpz.vercel.app/))
 
 ---
 
